@@ -1,9 +1,10 @@
 const sharp = require('sharp');
 const fs = require('fs');
-const directory = './images/';
+require('dotenv').config();
+const tinify = require('tinify');
+const directory = process.env.IMAGE_DIRECTORY;
 
-// Need to resize images, then convert images to webp before it resolves
-// "If you resize the images, then you can be converted"
+tinify.key = process.env.TINYPNG_KEY;
 
 /**
  * Loop through the images inside the image directory
@@ -19,9 +20,10 @@ function loopThrough(method) {
     return new Promise(resolve => {      
         for (let i = 0; imageCount > i; i++) {
             let image = images[i]; 
-            
-            imageWizard(image, method).then(() => {
-                next(resolve);
+            tinypng(image).then(() => {
+                imageWizard(image, method).then(() => {
+                    next(resolve);
+                });
             });
         }
     });
@@ -85,6 +87,14 @@ function imageProcess(image, newFile, resolve, width = null, height = null) {
         .catch(error => {
             console.log(error);
         });
+}
+
+function tinypng(image) {
+    return new Promise(resolve => {
+        let source = tinify.fromFile(directory + image);
+        source.toFile(directory + image);
+        resolve('done');
+    });
 }
 
 // Initiate image processing

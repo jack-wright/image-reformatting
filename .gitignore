@@ -1,1 +1,5 @@
 node_modules/
+.env
+*.webp
+*-mobile.*
+.DS_Store
